@@ -1,7 +1,6 @@
 ## Estimation for HOPE/ASPIRE trial
 
 est_ole <- function(HA_data) {
-  browser()
   hope_l0 <- est_hope_baseline(HA_data)
   aspr_l0 <- est_aspr_baseline(HA_data)
   ps0 <- est_ps0(HA_data) #ASPIRE placebo risk
@@ -9,11 +8,25 @@ est_ole <- function(HA_data) {
   aspr_cens <- est_aspr_cens(HA_data)
   hope_ps <- est_hope_ps(HA_data)
   aspr_ps <- est_aspr_ps(HA_data)
-  Qfun <- est_Qfun(HA_data, hope_ps, aspr_cens)
+  Qfun_info <- est_cf_surv(HA_data, hope_ps)
+  browser()
+  Qfun <- surv_pred_fun(Qfun_info)
+  browser()
+  aspr_placebo_surv <- est_obs_surv(
+    fit_data = HA_data %>% filter(trial == "aspr", arm == 0),
+    othr_data = HA_data %>% filter(trial == "hope" | arm == 1)
+      )
+  hope_obs_surv <- est_obs_surv(
+    fit_data = HA_data %>% filter(trial == "hope"),
+    othr_data = HA_data %>% filter(trial == "aspr")
+      )
   req_params <- list(
     "hope_l0" = hope_l0, "aspr_l0" = aspr_l0, "ps0" = ps0,
     "ph1" = ph1,  "aspr_cens" = aspr_cens, "hope_ps" = hope_ps,
-    "aspr_ps" = aspr_ps, "Qfun" = Qfun)
+    "aspr_ps" = aspr_ps, "Qfun" = Qfun,
+    "aspr_cf_active_surv" = Qfun_info,
+    "aspr_placebo_surv" = aspr_placebo_surv,
+    "hope_surv" = hope_obs_surv)
   calc_ic <- est_den_ic(HA_data, req_params)
   hope_l0 <- HA_data %>% filter(trial == "hope") %>% pull(l_0)
   param_0step <- mean(ps0(hope_l0) * ph1(hope_l0) / (1 - Qfun(hope_l0)))

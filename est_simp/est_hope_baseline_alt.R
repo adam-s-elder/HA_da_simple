@@ -1,5 +1,4 @@
 est_hope_l0 <- function(hope_aspire_data) {
-  browser()
   hope_dat <- hope_aspire_data %>% filter(trial == "hope") %>%
     mutate(y = event_time < 5)
   task <- sl3::sl3_Task$new(
