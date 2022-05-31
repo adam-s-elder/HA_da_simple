@@ -5,15 +5,15 @@ surv_pred_fun <- function(surv_preds) {
   if (!is.null(surv_preds$marg_aspr_df)) {
     comb_dat <-
       bind_rows(
-        surv_preds$marg_aspr_df %>% select(pid, l_0, est),
-        surv_preds$marg_hope_df %>% select(pid, l_0, est = pred)
+        surv_preds$marg_aspr_df %>% dplyr::select(pid, l_0, est),
+        surv_preds$marg_hope_df %>% dplyr::select(pid, l_0, est = pred)
       ) %>% group_by(l_0) %>% summarise(est = unique(est)) %>%
       ungroup()
   } else {
     comb_dat <-
       bind_rows(
-        surv_preds$obs %>% select(pid, l_0, est),
-        surv_preds$new %>% select(pid, l_0, est = pred)
+        surv_preds$obs %>% dplyr::select(pid, l_0, est),
+        surv_preds$new %>% dplyr::select(pid, l_0, est = pred)
       ) %>% group_by(l_0) %>% summarise(est = unique(est)) %>%
       ungroup()
   }
@@ -28,8 +28,8 @@ est_cf_surv <- function(hope_aspire_data, hope_prop_score) {
   aspr <- hope_aspire_data %>% filter(trial == "aspr", arm == 1)
   hope <- hope_aspire_data %>% filter((trial == "hope") | (arm == 0))
   hope_base <- hope %>%
-    select(l_0) %>% mutate(l_0 = as.factor(l_0))
-  aspr_base <- aspr %>% select(l_0) %>%
+    dplyr::select(l_0) %>% mutate(l_0 = as.factor(l_0))
+  aspr_base <- aspr %>% dplyr::select(l_0) %>%
     mutate(l_0 = as.factor(l_0))
   all_adhr <- rep(list(c(0, 1)), 4)
   names(all_adhr) <- paste0("cf.a.", 0:3)
@@ -49,11 +49,11 @@ est_cf_surv <- function(hope_aspire_data, hope_prop_score) {
     rownames(adhr) <- NULL
     obs <- bind_cols("id" = 1:nrow(aspr), aspr, x$fit$obs, adhr)
     obs$prop <- obs %>%
-      select(l_0, a.0 = cf.a.0, a.1 = cf.a.1,
+      dplyr::select(l_0, a.0 = cf.a.0, a.1 = cf.a.1,
              a.2 = cf.a.2, a.3 = cf.a.3) %>% hope_prop_score()
     new <- bind_cols("id" = 1:nrow(hope), hope, x$fit$new, adhr)
     new$prop <- new %>%
-      select(l_0, a.0 = cf.a.0, a.1 = cf.a.1,
+      dplyr::select(l_0, a.0 = cf.a.0, a.1 = cf.a.1,
              a.2 = cf.a.2, a.3 = cf.a.3) %>% hope_prop_score()
     return(list(obs = obs, new = new))
   })
@@ -82,17 +82,17 @@ est_cf_surv <- function(hope_aspire_data, hope_prop_score) {
 
 est_obs_surv <- function(fit_data, othr_data) {
   othr_base <- othr_data %>%
-    select(l_0) %>% mutate(l_0 = as.factor(l_0))
-  fit_base <- fit_data %>% select(l_0) %>%
+    dplyr::select(l_0) %>% mutate(l_0 = as.factor(l_0))
+  fit_base <- fit_data %>% dplyr::select(l_0) %>%
     mutate(l_0 = as.factor(l_0))
   fit <- fix_adh_es_ic(
         trial_data = fit_data,
         adherence_pattern = NULL,
         baseline_covs = fit_base,
         oos_baseline_covs = othr_base)
-  browser()
   return(list(
     obs = bind_cols(fit_data, fit$obs),
-    new = bind_cols(othr_data, fit$new)
+    new = bind_cols(othr_data, fit$new),
+    param_est = fit$param_est
     ))
 }

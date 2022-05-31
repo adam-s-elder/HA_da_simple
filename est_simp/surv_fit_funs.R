@@ -63,12 +63,13 @@ rip_survfit <- function(CF_surv_obj) {
   cond_ic <- marg_ic - (e_pred - ovrl)
   table(CF_surv_obj$data[, c("time", "event")])
   ret_df <-
-    matrix(c("est" = e_pred, "ic" = cond_ic),
-           ncol = 2, byrow = FALSE)
-  colnames(ret_df) <- c("est", "ic")
+    matrix(c("est" = e_pred, "ic" = cond_ic, "marg_ic" = marg_ic),
+           ncol = 3, byrow = FALSE)
+  colnames(ret_df) <- c("est", "ic", "marg_ic")
   e_pred_new <- CF_surv_obj$nuisance$event.pred.1$new
   e_pred_new <- e_pred_new[, ncol(e_pred_new), drop = FALSE]
   colnames(e_pred_new) <- "pred"
-  return(list("obs" = ret_df, "new" = e_pred_new))
+  return(list("obs" = ret_df, "new" = e_pred_new,
+              "param_est" = last(CF_surv_obj$surv.df$surv)))
 }
 

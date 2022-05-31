@@ -19,7 +19,7 @@ est_aspr_ps <- function(hope_aspire_data) {
     all_pos$pr2 ** all_pos$a.1 * (1 - all_pos$pr2) ** (1 - all_pos$a.1) *
     all_pos$pr3 ** all_pos$a.2 * (1 - all_pos$pr3) ** (1 - all_pos$a.2) *
     all_pos$pr4 ** all_pos$a.3 * (1 - all_pos$pr4) ** (1 - all_pos$a.3)
-  jnt_pred <- all_pos %>% select(l_0, a.0, a.1, a.2, a.3, jnt_pr)
+  jnt_pred <- all_pos %>% dplyr::select(l_0, a.0, a.1, a.2, a.3, jnt_pr)
   pred_fun <- function(l0_and_a){
     left_join(l0_and_a, jnt_pred, by = colnames(l0_and_a)) %>%
       pull(jnt_pr)

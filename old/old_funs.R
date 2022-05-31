@@ -30,7 +30,7 @@
 # y[delt == 0] <- 1 #If delta = 0, censoring happened, so indicator will be 0
 # delt[y == 1] <- 0 #If y = 1, event happened so indicator will be zer0
 # (1 - y) * delt
-# ip <- 1 / aspr_cens_fun(this_dat %>% select(l_0))
+# ip <- 1 / aspr_cens_fun(this_dat %>% dplyr::select(l_0))
 # this_dat$psudo_outcome <- (1 - y) * delt * ip
 # this_dat$ip <- ip
 # ### TODO: Make sure to check this!!!!OMG CHECK THIS FOR THE LOVE
@@ -42,8 +42,8 @@
 #                        a.0 = c(0, 1), a.1 = c(0, 1),
 #                        a.2 = c(0, 1), a.3 = c(0, 1))
 # all_pos$expect <- predict(pred_mod, all_pos, type = "response")
-# all_pos$weight <- hope_prop_score(all_pos %>% select(-expect))
+# all_pos$weight <- hope_prop_score(all_pos %>% dplyr::select(-expect))
 # all_pos <- all_pos %>% group_by(l_0) %>%
 #   summarise(tot_prob = sum(weight),
 #             expec = sum(expect * weight))
-# pred_df <- all_pos %>% select(l_0, surv = expec)
+# pred_df <- all_pos %>% dplyr::select(l_0, surv = expec)
