@@ -17,6 +17,13 @@ surv_pred_fun <- function(surv_preds) {
       ) %>% group_by(l_0) %>% summarise(est = unique(est)) %>%
       ungroup()
   }
+  if (nrow(comb_dat) > length(unique(comb_dat$l_0))) {
+    warning("some inconsistent prediction values")
+    print(comb_dat %>% group_by(l_0) %>%
+          summarise(sd = sd(est)))
+    comb_dat <- comb_dat %>% group_by(l_0) %>%
+      filter(row_number() == 1) %>% ungroup()
+  }
   pred_fun <- function(l0){
     left_join(l0, comb_dat, by = setdiff(colnames(comb_dat), "est")) %>%
       pull(est)
