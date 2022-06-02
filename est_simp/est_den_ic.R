@@ -22,10 +22,11 @@ est_den_ic <- function(hope_aspire_data, param_list) {
     )
   }
   # Part 1 (Phi_1) ----------------------------------------------------------
-  hope_l <- hope_surv$obs %>%
-    mutate(q = qfun(data.frame(l_0 = l_0)),
-           aspr_pl_surv = aspr_pl_surv(data.frame(l_0 = l_0)),
-           ic_1 = (1/prop_r) * ic * (1 - aspr_pl_surv) / (1 - q))
+  hope_l <- hope_surv$obs
+  hope_l$q <- qfun(hope_l %>% select(l_0))
+  hope_l$aspr_pl_surv <- aspr_pl_surv(hope_l %>% select(l_0))
+  hope_l <- hope_l %>% 
+    mutate(ic_1 = (1/prop_r) * ic * (1 - aspr_pl_surv) / (1 - q))
   ic_df <- left_join(ic_df, hope_l %>% dplyr::select(pid, ic_1), by = "pid")
   # Part 2 (Phi_2) ----------------------------------------------------------
   phi2_df <- aspr_placebo_surv$obs
@@ -41,10 +42,11 @@ est_den_ic <- function(hope_aspire_data, param_list) {
   ic_df <- left_join(ic_df, phi2_df %>% dplyr::select(pid, ic_2), by = "pid")
   # Part 3 (Phi_3) ----------------------------------------------------------
   ## TODO: CHECK WHAT SHOULD BE DONE HERE!!!!!
-  phi3_df <- hope_surv$obs %>%
+  phi3_df <- hope_surv$obs
+  phi3_df$q <- phi3_df$est - qfun(phi3_df %>% select(l_0))
+  phi3_df <- phi3_df %>%
     mutate(ratio = risk_ratio_pred(l_0),
-           dif = est - qfun(data.frame(l_0 = l_0)),
-           ic_3 = ratio * dif * (1 / prop_r))
+           dif = est - q, ic_3 = ratio * dif * (1 / prop_r))
   ic_df <- left_join(ic_df, phi3_df %>% dplyr::select(pid, ic_3), by = "pid")
   # Part 4 (Phi_4) ----------------------------------------------------------
   phi4_df <- aspr_active_surv$marg_aspr_df
