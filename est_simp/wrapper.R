@@ -3,11 +3,7 @@
 est_ose <- function(HA_data) {
   hope_l0 <- est_hope_baseline(HA_data)
   aspr_l0 <- est_aspr_baseline(HA_data)
-  ps0 <- est_ps0(HA_data) #ASPIRE placebo risk
-  ph1 <- est_ph1(HA_data) #HOPE active-arm risk
-  aspr_cens <- est_aspr_cens(HA_data)
   hope_ps <- est_hope_ps(HA_data)
-  aspr_ps <- est_aspr_ps(HA_data)
   Qfun_info <- est_cf_surv(HA_data, hope_ps)
   Qfun <- surv_pred_fun(Qfun_info)
   aspr_placebo_surv <- est_obs_surv(
@@ -19,12 +15,11 @@ est_ose <- function(HA_data) {
     othr_data = HA_data %>% filter(trial == "aspr")
       )
   req_params <- list(
-    "hope_l0" = hope_l0, "aspr_l0" = aspr_l0, "ps0" = ps0,
-    "ph1" = ph1,  "aspr_cens" = aspr_cens, "hope_ps" = hope_ps,
-    "aspr_ps" = aspr_ps, "Qfun" = Qfun,
-    "aspr_cf_active_surv" = Qfun_info,
+    "hope_l0" = hope_l0, "aspr_l0" = aspr_l0,
+    "Qfun" = Qfun, "aspr_cf_active_surv" = Qfun_info,
     "aspr_placebo_surv" = aspr_placebo_surv,
-    "hope_surv" = hope_obs_surv)
+    "hope_surv" = hope_obs_surv
+    )
   calc_ic <- est_den_ic(HA_data, req_params)
   prop_r <- sum(HA_data$trial == "hope") / sum(HA_data$trial == "aspr")
   numerator_ic <- hope_obs_surv$obs %>% dplyr::select(pid, marg_ic) %>%
